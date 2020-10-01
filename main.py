@@ -21,8 +21,10 @@ def main():
     covidFrame = pd.read_csv(inpath + covidFile, parse_dates=[0])
     carrierFrame = planes.Clean(pd.read_csv(inpath + carrierFile))
     firstMerge = plague.CleanAndMerge(covidFrame, electionFrame)
-    secondMerge = firstMerge.merge(mergedStonks, left_on='date', right_on='Date')
+    secondMerge = firstMerge.merge(mergedStonks, left_on='date', right_on='Date', how='left')
     secondMerge.drop(columns=['Date'], inplace=True)
+    secondMerge.sort_values(by=['date', 'fips'], inplace=True)
+    secondMerge.fillna(method='ffill', inplace=True)
     secondMerge.to_csv(outpath +  "SecondTry.csv", index=False)
   
 main()

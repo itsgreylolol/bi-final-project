@@ -12,13 +12,8 @@ def Clean(dfs):
     newDfs = []
     for key in dfs:
         df = dfs[key]
-        df = df.loc[df["Date"] >= pd.Timestamp(2020, 1, 21), ]
-        df[key + " Open"] = df["Open"]
-        df[key + " High"] = df["High"]
-        df[key + " Low"] = df["Low"]
-        df[key + " Close"] = df["Close"]
+        df = df.loc[(df["Date"] >= pd.Timestamp(2020, 1, 21)) & (df["Date"] < pd.Timestamp(2020, 7, 1)), ]
         df[key + " Adj Close"] = df["Adj Close"]
-        df[key + " Volume"] = df["Volume"]
         df.drop(columns=["Open", "High", "Low", "Close", "Adj Close", "Volume"], inplace=True)
         newDfs.append(df)
     return newDfs
