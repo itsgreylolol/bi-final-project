@@ -21,4 +21,12 @@ def EncodeNewColumns(df):
     df['region'] = 0
     for index, item in enumerate(regions):
         df['region'][df['state'].isin(item)] = index+1
+    
+    df.sort_values(['fips', 'date'], inplace=True)
+    df['casedelta'] = df['cases'][df['cases'] >= df['cases'].shift()].sub(df['cases'].shift())
+    df['casedelta'].fillna(df['cases'], inplace=True)
+    df['casedelta'] = df['casedelta'].astype('int64')
+    df['deathdelta'] = df['deaths'][df['deaths'] >= df['deaths'].shift()].sub(df['deaths'].shift())
+    df['deathdelta'].fillna(df['deaths'], inplace=True)
+    df['deathdelta'] = df['deathdelta'].astype('int64')
     return df
