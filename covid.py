@@ -2,7 +2,7 @@ def CleanAndMerge(covidFrame, electionFrame):
     covidFrame['fips'][covidFrame['county'] == 'New York City'] = 36061
     covidFrame.dropna(subset=['fips'], inplace=True)
     mergedFrame = covidFrame.merge(electionFrame, on='fips')
-    return EncodeNewColumns(mergedFrame)
+    return mergedFrame
 
 def EncodeNewColumns(df):
     # https://en.wikipedia.org/wiki/List_of_regions_of_the_United_States#Standard_Federal_Regions for region reference
@@ -23,10 +23,10 @@ def EncodeNewColumns(df):
         df['region'][df['state'].isin(item)] = index+1
     
     df.sort_values(['fips', 'date'], inplace=True)
-    df['casedelta'] = df['cases'][df['cases'] >= df['cases'].shift()].sub(df['cases'].shift())
+    df['casedelta'] = df['cases'][df['fips'] == df['fips'].shift()].sub(df['cases'].shift())
     df['casedelta'].fillna(df['cases'], inplace=True)
     df['casedelta'] = df['casedelta'].astype('int64')
-    df['deathdelta'] = df['deaths'][df['deaths'] >= df['deaths'].shift()].sub(df['deaths'].shift())
+    df['deathdelta'] = df['deaths'][df['fips'] == df['fips'].shift()].sub(df['deaths'].shift())
     df['deathdelta'].fillna(df['deaths'], inplace=True)
     df['deathdelta'] = df['deathdelta'].astype('int64')
     return df
