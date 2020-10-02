@@ -24,7 +24,7 @@ def main():
     secondMerge = firstMerge.merge(mergedStonks, left_on='date', right_on='Date', how='left')
     secondMerge.drop(columns=['Date'], inplace=True)
     secondMerge.fillna(method='ffill', inplace=True)
-    thirdMerge = secondMerge.merge(carrierFrame, on='date')
+    thirdMerge = secondMerge.merge(carrierFrame, how='left')
     deltaFrame = plague.EncodeNewColumns(thirdMerge)
     deltaFrame.sort_values(by=['date', 'fips'], inplace=True)
     deltaFrame.to_csv(outpath + "Final.csv", index=False)
