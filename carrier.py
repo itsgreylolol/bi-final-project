@@ -29,24 +29,18 @@ def Clean(df):
     return Upsample(newDf)
     
 def Upsample(df):
-    #Get the flight counts for each month
-    #Can use any arbitrary column, I used passengers
-    flights_by_month = df.groupby(['CARRIER_NAME', 'MONTH'])
-
-    #List of days for every month in the dataset
-    days_of_month = [31,29,31,30,31,30]
-    newerDfList = []
+    flights_by_month = df[['PASSENGERS', 'MONTH', 'CARRIER_NAME']].groupby('CARRIER_NAME')
+    final = pd.DataFrame()
     for key, item in flights_by_month:
-        newerDf = pd.DataFrame({ 'date': pd.date_range('2020-' + str(item['MONTH'].iloc[0]) + '-1', periods=days_of_month[item['MONTH'].iloc[0] - 1]),
-                                 'avgPassengers': np.nan})
-        newerDf['avgPassengers'].iloc[0] = item['PASSENGERS'].sum() / days_of_month[item['MONTH'].iloc[0] - 1]
-        newerDf['carrier'] = item['CARRIER_NAME'].iloc[0]
-        newerDf.set_index(['date'], inplace=True)
-        newerDf.index = pd.to_datetime(newerDf.index)
-        newerDfList.append(newerDf)
-    newestDf = pd.concat(newerDfList)
-    
-    #Upsample and interpolate
-    upsampled = newestDf.avgPassengers.resample('D').mean()
-    newestDf['avgPassengers'] = upsampled.interpolate(method='spline', order=2)
-    return newestDf
+        fieldName = str(item['CARRIER_NAME'].iloc[0] + 'avgPassengers')
+        ranges = pd.to_datetime(['1/1/2020','2/1/2020', '3/1/2020', '4/1/2020', '5/1/2020', '6/1/2020', '6/30/2020'])
+        newDf = pd.DataFrame({ 'date': ranges })
+        newDf.set_index(ranges, inplace=True)
+        newDf[fieldName] = np.nan
+        group = item.groupby(['MONTH'])['PASSENGERS']
+        for innerKey, innerItem in group:
+            newDf[fieldName][innerKey-1 % 7] = innerItem.mean()
+        upsampled = newDf[fieldName].resample('D').mean()
+        final[fieldName] = upsampled.interpolate(method='spline', order=2)
+    final['date'] = final.index
+    return final
