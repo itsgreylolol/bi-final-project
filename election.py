@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 
 def Clean(df):
     df['fips'] = pd.to_numeric(df['fips'], errors='coerce')
