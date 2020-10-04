@@ -49,5 +49,4 @@ def Upsample(df):
         upsampled = newDf[colorFieldName].resample('D').mean()
         final[colorFieldName] = upsampled.interpolate(method='spline', order=2)
     final['date'] = final.index
-    print(final.count())
     return final
