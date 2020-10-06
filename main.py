@@ -3,6 +3,7 @@ import stocks as stonks
 import election as drumpf
 import covid as plague
 import carrier as planes
+import Visualizations as visuals
 
 inpath = "Datasets\\"
 outpath = "Output\\"
@@ -30,5 +31,6 @@ def main():
     deltaFrame = plague.EncodeNewColumns(thirdMerge)
     deltaFrame.sort_values(by=['date', 'fips'], inplace=True)
     deltaFrame.to_csv(outpath + "Final.csv", index=False)
+    visuals.Visualize(deltaFrame, outpath)
   
 main()
